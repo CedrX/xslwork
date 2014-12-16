@@ -10,7 +10,7 @@
     <xd:doc scope="stylesheet">
         <xd:desc>
             <xd:p><xd:b>Created on:</xd:b> Dec 16, 2014</xd:p>
-            <xd:p><xd:b>Author:</xd:b> tintanet</xd:p>
+            <xd:p><xd:b>Author:</xd:b> tintanet Cédric</xd:p>
             <xd:p></xd:p>
         </xd:desc>
     </xd:doc>
