@@ -30,7 +30,15 @@
         <xsl:value-of select="substring-after($pText,concat($target,'='))"/>
     </xsl:variable>
     <xsl:variable name="beforeOtherIdt">
-        <xsl:value-of select="substring-before($afterTarget,'&amp;')"/>
+       <!-- <xsl:if test="ends-with($pText,$afterTarget)">
+            <xsl:value-of select="$afterTarget"/>
+        </xsl:if>-->
+        <xsl:if test="contains($afterTarget,'&amp;')">
+            <xsl:value-of select="substring-before($afterTarget,'&amp;')"/>
+        </xsl:if>
+        <xsl:if test="not(contains($afterTarget,'&amp;'))">
+            <xsl:value-of select="$afterTarget"/>
+        </xsl:if>
     </xsl:variable>
     <xsl:value-of select="$beforeOtherIdt"/>
 </xsl:template>
@@ -124,22 +132,29 @@
         <xsl:attribute name="xsi:noNamespaceSchemaLocation">
             <xsl:value-of select="$schemaMODS"/>
         </xsl:attribute>
-        <mods>
+        <xsl:text >&#10;</xsl:text>
             <xsl:for-each select="//oai:record">
+                <mods>
                 <xsl:if test="oai:metadata/dcterms:qualifieddc/dc:title">
-                    <titleInfo>
-                        <title>
-                            <xsl:call-template name="deleteCarriage">
-                                <xsl:with-param name="pText" select="oai:metadata/dcterms:qualifieddc/dc:title"/>
-                                </xsl:call-template>
-                        </title>
-                    </titleInfo>
+                    <xsl:for-each select="oai:metadata/dcterms:qualifieddc/dc:title">
+                        <xsl:if test="position()=1">
+                            <titleInfo>
+                                <title>
+                                    <xsl:call-template name="deleteCarriage">
+                                        <xsl:with-param name="pText" select="."/>
+                                        </xsl:call-template>
+                                </title>
+                            </titleInfo>
+                        </xsl:if>
+                    </xsl:for-each>
                 </xsl:if>
                 <!-- Récupération des issn/eissn et numéro de volume-->
                 <xsl:if test="oai:metadata/dcterms:qualifieddc/ulg:bibliographicCitation">
-                    <xsl:call-template name="findISXN">
-                        <xsl:with-param name="pText" select="oai:metadata/dcterms:qualifieddc/ulg:bibliographicCitation"/>
-                    </xsl:call-template>                    
+                    <xsl:for-each select="oai:metadata/dcterms:qualifieddc/ulg:bibliographicCitation">
+                        <xsl:call-template name="findISXN">
+                            <xsl:with-param name="pText" select="."/>
+                        </xsl:call-template>
+                    </xsl:for-each>                        
                 </xsl:if>
                 
                 <!-- Récupération du DOI -->
@@ -159,7 +174,7 @@
                         
                     </xsl:for-each>
                 </xsl:variable>                
-                <xsl:if test="$finalDOI!=''">                    
+                 <xsl:if test="$finalDOI!='' and $finalDOI!='|'">                    
                     <identifier type="doi"><xsl:value-of select="substring-before(replace($finalDOI, '^\|+', ''),'|')"/></identifier>
                 </xsl:if>
                 
@@ -201,8 +216,11 @@
                     </recordIdentifier>
                     <recordOrigin>Converted from QDC to MODS (ORBI)</recordOrigin>
                 </recordInfo>
-           </xsl:for-each>
-        </mods>
+              </mods>
+                <xsl:text >&#10;</xsl:text>
+            </xsl:for-each>
+        
+        
     </modsCollection>
 </xsl:template>
 </xsl:stylesheet>
